@@ -16,27 +16,32 @@ public class AdapterConnect extends BaseExpandableListAdapter {
     private LayoutInflater inflater;
     private  List<BluetoothGattCharacteristic> characteristics;
 
-        public AdapterConnect(Context context,List<BluetoothGattService> list) {
+    @Override
+    public int getGroupCount() {
+        return 0;
+    }
+
+    @Override
+    public int getChildrenCount(int groupPosition) {
+        return 0;
+    }
+
+    @Override
+    public Object getGroup(int groupPosition) {
+        return service.get(groupPosition).getUuid();
+    }
+
+    @Override
+    public Object getChild(int groupPosition, int childPosition) {
+        return service.get(groupPosition).getCharacteristics().get(childPosition).getUuid();
+    }
+
+    public AdapterConnect(Context context, List<BluetoothGattService> list, List<BluetoothGattCharacteristic> list1) {
         super();
         inflater = LayoutInflater.from(context);
         service = list;
+        characteristics = list1;
 
-    }
-    @Override
-    public int getGroupCount() {
-        return service.size();
-    }
-    @Override
-    public int getChildrenCount(int groupPosition) {
-        return service.get(groupPosition).getCharacteristics().size();
-    }
-    @Override
-    public Object getGroup(int groupPosition) {
-        return service.get(groupPosition);
-    }
-    @Override
-    public Object getChild(int groupPosition, int childPosition) {
-        return service.get(groupPosition).getCharacteristics();
     }
 
     @Override

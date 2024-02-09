@@ -31,6 +31,7 @@ public class BluetoothConnectActivity extends AppCompatActivity {
     String adress;
     TextView txt;
     List<BluetoothGattService> services;
+    List<BluetoothGattCharacteristic> characteristics;
     ExpandableListView listView ;
     AdapterConnect adapterConnect;
     @SuppressLint("MissingPermission")
@@ -49,7 +50,7 @@ public class BluetoothConnectActivity extends AppCompatActivity {
         txt.setText(device.getAddress() + "\n" + device.getName());
 
         listView = findViewById(R.id.services);
-        adapterConnect = new AdapterConnect(this,services);
+        adapterConnect = new AdapterConnect(this,services,characteristics);
         listView.setAdapter(adapterConnect);
     }
     private BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
@@ -76,7 +77,7 @@ public class BluetoothConnectActivity extends AppCompatActivity {
                 services = gatt.getServices();
                 for (BluetoothGattService service : services) {
                     Log.i("SERVICE_UUID", service.getUuid().toString());
-                    List<BluetoothGattCharacteristic> characteristics = service.getCharacteristics();
+                    characteristics= service.getCharacteristics();
                     for (BluetoothGattCharacteristic characteristic : characteristics) {
                         Log.i("CHARACTERISTIC_UUID", characteristic.getUuid().toString());
                     }
