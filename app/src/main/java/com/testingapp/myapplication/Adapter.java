@@ -8,9 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import java.util.List;
 
 public class Adapter extends ArrayAdapter<BluetoothDevice> {
@@ -28,7 +25,7 @@ public class Adapter extends ArrayAdapter<BluetoothDevice> {
 
         View view=inflater.inflate(this.layout, parent, false);
 
-        TextView nameView = view.findViewById(R.id.textView);
+        TextView nameView = view.findViewById(R.id.info);
 
         BluetoothDevice device = deviceList.get(position);
 

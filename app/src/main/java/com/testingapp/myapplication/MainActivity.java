@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     BluetoothManager manager;
     BluetoothAdapter bluetoothAdapter;
     BluetoothLeScanner scanner;
-    BluetoothGatt bluetoothGatt;
+
     List<BluetoothDevice> list;
     ListView listView;
     Adapter adapter;
@@ -44,21 +44,25 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         permission();
-        list = new ArrayList<>();
-        manager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
-        bluetoothAdapter = manager.getAdapter();
-        scanner = bluetoothAdapter.getBluetoothLeScanner();
-
-        listView = findViewById(R.id.listview);
-        adapter = new Adapter(this,R.layout.list_item,list);
-        listView.setAdapter(adapter);
-
+        init();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 BluetoothDevice device = list.get(position);
+                Intent intent = new Intent(MainActivity.this, BluetoothConnectActivity.class);
+                intent.putExtra("device", device.getAddress());
+                startActivity(intent);
             }
         });
+    }
+    private void init(){
+        list = new ArrayList<>();
+        manager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
+        bluetoothAdapter = manager.getAdapter();
+        scanner = bluetoothAdapter.getBluetoothLeScanner();
+        listView = findViewById(R.id.listview);
+        adapter = new Adapter(this,R.layout.list_item,list);
+        listView.setAdapter(adapter);
     }
     private void permission(){
 
@@ -91,46 +95,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onScanFailed(int errorCode) {
             super.onScanFailed(errorCode);
-        }
-    };
-    private BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
-        @Override
-        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            super.onConnectionStateChange(gatt, status, newState);
-            switch (newState) {
-                case BluetoothProfile.STATE_CONNECTED:
-                    Log.i("Bluetooth", "Connected to GATT server.");
-                    // Попробуйте запустить обнаружение служб
-                    Log.i("Bluetooth", "Attempting to start service discovery:" +
-                            gatt.discoverServices());
-                    break;
-                case BluetoothProfile.STATE_DISCONNECTED:
-                    Log.i("Bluetooth", "Disconnected from GATT server.");
-                    break;
-            }
-        }
-        @Override
-        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            super.onServicesDiscovered(gatt, status);
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                // На этом этапе вы можете получить информацию о службах
-                List<BluetoothGattService> services = gatt.getServices();
-            } else {
-                Log.w("Bluetooth", "onServicesDiscovered received: " + status);
-            }
-
-        }
-        @Override
-        public void onCharacteristicRead(@NonNull BluetoothGatt gatt, @NonNull BluetoothGattCharacteristic characteristic, @NonNull byte[] value, int status) {
-            super.onCharacteristicRead(gatt, characteristic, value, status);
-        }
-        @Override
-        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            super.onCharacteristicWrite(gatt, characteristic, status);
-        }
-        @Override
-        public void onCharacteristicChanged(@NonNull BluetoothGatt gatt, @NonNull BluetoothGattCharacteristic characteristic, @NonNull byte[] value) {
-            super.onCharacteristicChanged(gatt, characteristic, value);
         }
     };
     @SuppressLint("MissingPermission")
