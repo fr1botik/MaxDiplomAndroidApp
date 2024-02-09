@@ -12,12 +12,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ExpandableListView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BluetoothConnectActivity extends AppCompatActivity {
@@ -26,22 +30,30 @@ public class BluetoothConnectActivity extends AppCompatActivity {
     BluetoothDevice device;
     String adress;
     TextView txt;
-
+    List<BluetoothGattService> services;
+    ExpandableListView listView ;
+    AdapterConnect adapterConnect;
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bluetooth_connect_activity);
+        services = new ArrayList<>();
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         adress = getIntent().getStringExtra("device");
         device = bluetoothAdapter.getRemoteDevice(adress);
         Log.d("ZXC",device.getAddress() + "   " + device.getName());
+
         txt = findViewById(R.id.info);
         txt.setText(device.getAddress() + "\n" + device.getName());
 
+        listView = findViewById(R.id.services);
+        adapterConnect = new AdapterConnect(this,services);
+        listView.setAdapter(adapterConnect);
     }
     private BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
+        @SuppressLint("MissingPermission")
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             super.onConnectionStateChange(gatt, status, newState);
@@ -61,12 +73,16 @@ public class BluetoothConnectActivity extends AppCompatActivity {
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                // На этом этапе вы можете получить информацию о службах
-                List<BluetoothGattService> services = gatt.getServices();
-            } else {
-                Log.w("Bluetooth", "onServicesDiscovered received: " + status);
+                services = gatt.getServices();
+                for (BluetoothGattService service : services) {
+                    Log.i("SERVICE_UUID", service.getUuid().toString());
+                    List<BluetoothGattCharacteristic> characteristics = service.getCharacteristics();
+                    for (BluetoothGattCharacteristic characteristic : characteristics) {
+                        Log.i("CHARACTERISTIC_UUID", characteristic.getUuid().toString());
+                    }
+                }
+                adapterConnect.notifyDataSetChanged();
             }
-
         }
         @Override
         public void onCharacteristicRead(@NonNull BluetoothGatt gatt, @NonNull BluetoothGattCharacteristic characteristic, @NonNull byte[] value, int status) {
@@ -81,4 +97,9 @@ public class BluetoothConnectActivity extends AppCompatActivity {
             super.onCharacteristicChanged(gatt, characteristic, value);
         }
     };
+    public void click(View view) {
+
+        bluetoothGatt = device.connectGatt(this,false,gattCallback);
+
+    }
 }
