@@ -34,7 +34,6 @@ public class BluetoothConnectActivity extends AppCompatActivity {
     BluetoothGattService services;
     List<BluetoothGattCharacteristic> characteristics;
     ExpandableListView listView ;
-    AdapterConnect adapterConnect;
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState){
