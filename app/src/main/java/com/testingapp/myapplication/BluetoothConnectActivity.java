@@ -92,6 +92,9 @@ public class BluetoothConnectActivity extends AppCompatActivity {
             byte[] value1 = characteristic.getValue();
             String test = new String(value1, StandardCharsets.UTF_8);
             Log.i("Bluetooth", test);
+            Intent intent = new Intent(BluetoothConnectActivity.this,GetActivity.class);
+            intent.putExtra("ip",test);
+            startActivity(intent);
         }
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
@@ -127,5 +130,6 @@ public class BluetoothConnectActivity extends AppCompatActivity {
         } else {
             Log.i("Bluetooth", "Read operation could not be initiated");
         }
+
     }
 }
