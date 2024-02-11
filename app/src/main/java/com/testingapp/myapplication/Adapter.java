@@ -34,4 +34,3 @@ public class Adapter extends ArrayAdapter<BluetoothDevice> {
         return view;
     }
 }
-

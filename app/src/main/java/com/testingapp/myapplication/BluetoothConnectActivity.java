@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class BluetoothConnectActivity extends AppCompatActivity {
     BluetoothDevice device;
     String adress;
     TextView txt;
-    List<BluetoothGattService> services;
+    BluetoothGattService services;
     List<BluetoothGattCharacteristic> characteristics;
     ExpandableListView listView ;
     AdapterConnect adapterConnect;
@@ -39,7 +40,6 @@ public class BluetoothConnectActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bluetooth_connect_activity);
-        services = new ArrayList<>();
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         adress = getIntent().getStringExtra("device");
@@ -50,8 +50,7 @@ public class BluetoothConnectActivity extends AppCompatActivity {
         txt.setText(device.getAddress() + "\n" + device.getName());
 
         listView = findViewById(R.id.services);
-        adapterConnect = new AdapterConnect(this,services,characteristics);
-        listView.setAdapter(adapterConnect);
+
     }
     private BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
         @SuppressLint("MissingPermission")
@@ -74,20 +73,25 @@ public class BluetoothConnectActivity extends AppCompatActivity {
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                services = gatt.getServices();
-                for (BluetoothGattService service : services) {
-                    Log.i("SERVICE_UUID", service.getUuid().toString());
-                    characteristics= service.getCharacteristics();
-                    for (BluetoothGattCharacteristic characteristic : characteristics) {
-                        Log.i("CHARACTERISTIC_UUID", characteristic.getUuid().toString());
+                for(BluetoothGattService service: gatt.getServices()) {
+                    if (!service.getUuid().toString().startsWith("000018"))
+                    {   services = gatt.getService(service.getUuid());
+                        characteristics  = services.getCharacteristics();
+                        Log.d("zxc","SERVICE UUID " + services.getUuid());
+                        for (BluetoothGattCharacteristic characteristic: characteristics){
+                            Log.d("zxc","CUSTOM " + characteristic.getUuid().toString());
+                        }
                     }
                 }
-                adapterConnect.notifyDataSetChanged();
             }
         }
         @Override
         public void onCharacteristicRead(@NonNull BluetoothGatt gatt, @NonNull BluetoothGattCharacteristic characteristic, @NonNull byte[] value, int status) {
             super.onCharacteristicRead(gatt, characteristic, value, status);
+
+            byte[] value1 = characteristic.getValue();
+            String test = new String(value1, StandardCharsets.UTF_8);
+            Log.i("Bluetooth", test);
         }
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
@@ -99,8 +103,29 @@ public class BluetoothConnectActivity extends AppCompatActivity {
         }
     };
     public void click(View view) {
-
-        bluetoothGatt = device.connectGatt(this,false,gattCallback);
-
+        bluetoothGatt = device.connectGatt(this,false,gattCallback,BluetoothDevice.TRANSPORT_LE);
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        bluetoothGatt.disconnect();
+    }
+    public void asdasd(View view) {
+        String value = "MGTS_GPON_852A,Hesoyam99";
+        BluetoothGattCharacteristic characteristic = characteristics.get(0);
+        characteristic.setValue(value);
+        if (bluetoothGatt.writeCharacteristic(characteristic)) {
+            Log.i("Bluetooth", "Write initiated");
+        } else {
+            Log.i("Bluetooth", "Write operation could not be initiated");
+        }
+    }
+    public void zxczxc(View view) {
+        BluetoothGattCharacteristic characteristic = characteristics.get(0);
+        if (bluetoothGatt.readCharacteristic(characteristic)) {
+            Log.i("Bluetooth", "Read initiated");
+        } else {
+            Log.i("Bluetooth", "Read operation could not be initiated");
+        }
     }
 }
