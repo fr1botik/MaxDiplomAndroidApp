@@ -54,7 +54,7 @@ public class GetActivity extends AppCompatActivity {
         Date date = new Date();
         System.out.println(date);
         spinner = findViewById(R.id.spinner);
-        addres = getIntent().getStringExtra("ip");
+        addres = "http://" + getIntent().getStringExtra("ip");
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mass);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
