@@ -44,7 +44,6 @@ public class GetActivity extends AppCompatActivity {
     Spinner spinner;
     String value,temp,magnet,addres;
 
-
     //Инициализация приложения
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +79,6 @@ public class GetActivity extends AppCompatActivity {
         Request request = new Request.Builder()
                 .url(addres+"temp")
                 .build();
-
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull Response response) throws IOException {
