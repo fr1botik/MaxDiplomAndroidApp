@@ -47,8 +47,8 @@ public class BluetoothConnectActivity extends AppCompatActivity {
         bluetoothGatt = device.connectGatt(this,false,gattCallback,BluetoothDevice.TRANSPORT_LE);
 
         txt = findViewById(R.id.info);
-        txt.setText(device.getAddress() + "\n" + device.getName());
 
+        txt.setText(device.getAddress() + "\n" + device.getName());
     }
     private BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
         @SuppressLint("MissingPermission")
@@ -57,12 +57,9 @@ public class BluetoothConnectActivity extends AppCompatActivity {
             super.onConnectionStateChange(gatt, status, newState);
             switch (newState) {
                 case BluetoothProfile.STATE_CONNECTED:
-                    Log.i("Bluetooth", "Connected to GATT server.");
-                    Log.i("Bluetooth", "Attempting to start service discovery:" +
-                            gatt.discoverServices());
+                            gatt.discoverServices();
                     break;
                 case BluetoothProfile.STATE_DISCONNECTED:
-                    Log.i("Bluetooth", "Disconnected from GATT server.");
                     break;
             }
         }
@@ -82,7 +79,6 @@ public class BluetoothConnectActivity extends AppCompatActivity {
                 }
             }
         }
-
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicRead(gatt, characteristic, status);
@@ -93,9 +89,17 @@ public class BluetoothConnectActivity extends AppCompatActivity {
 
             if(test!= null){
 
+                SQL_Class sqlClass = new SQL_Class();
+                int a = 1;
+                if(sqlClass.SQL_connect()) {
+                    a = sqlClass.sql_device(device.getAddress());
+                }
+
                 Intent intent = new Intent(BluetoothConnectActivity.this,GetActivity.class);
                 intent.putExtra("ip",test);
+                intent.putExtra("id_device",a);
                 startActivity(intent);
+
             }
             else{
                 Toast.makeText(BluetoothConnectActivity.this,"Нет подключения к WiFi",Toast.LENGTH_SHORT).show();
@@ -119,12 +123,12 @@ public class BluetoothConnectActivity extends AppCompatActivity {
         String value = "MGTS_GPON_852A,Hesoyam99";
         BluetoothGattCharacteristic characteristic = characteristics.get(0);
         characteristic.setValue(value);
-        bluetoothGatt.writeCharacteristic(characteristic))
+        bluetoothGatt.writeCharacteristic(characteristic);
 
     }
     public void Get_Ip(View view) {
-        BluetoothGattCharacteristic characteristic = characteristics.get(0);
-        bluetoothGatt.readCharacteristic(characteristic))
+        BluetoothGattCharacteristic characteristic = characteristics.get(1);
+        bluetoothGatt.readCharacteristic(characteristic);
 
     }
 }

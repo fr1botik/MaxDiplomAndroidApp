@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
     BluetoothManager manager;
     BluetoothAdapter bluetoothAdapter;
     BluetoothLeScanner scanner;
-
     List<BluetoothDevice> list;
     ListView listView;
     Adapter adapter;
@@ -112,11 +111,5 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }, 5000);
-
-    }
-    @SuppressLint("MissingPermission")
-    private void stropscan(){
-
-        scanner.stopScan(scanCallback);
     }
 }

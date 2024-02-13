@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 public class DialogFragment extends androidx.fragment.app.DialogFragment {
+
     final String[] working = {"работа1", "работа2", "работа3"};
     boolean[] checkedItemsArray = {false, false, false};
 
@@ -46,7 +47,6 @@ public class DialogFragment extends androidx.fragment.app.DialogFragment {
 
         return builder.create();
     }
-
     public boolean saveArray(boolean[] array, String arrayName, Context mContext) {
         SharedPreferences prefs = mContext.getSharedPreferences("preferencename", 0);
         SharedPreferences.Editor editor = prefs.edit();
@@ -54,7 +54,6 @@ public class DialogFragment extends androidx.fragment.app.DialogFragment {
             editor.putBoolean(arrayName + "_" + i, array[i]);
         return editor.commit();
     }
-
     public void loadArray(Context mContext) {
         SharedPreferences prefs = mContext.getSharedPreferences("preferencename", 0);
         for(int i=0;i<checkedItemsArray.length;i++)

@@ -32,7 +32,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-
 public class GetActivity extends AppCompatActivity {
 
     //Объявление переменных
@@ -41,24 +40,28 @@ public class GetActivity extends AppCompatActivity {
     String[] mass;
     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
     Date date;
+    int id_device;
     Spinner spinner;
     String value,temp,magnet,addres;
+    SQL_Class sqlClass;
 
     //Инициализация приложения
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.get_activity);
+
         mass = new String[]{"temp", "magnet", "vibro"};
-        Date date = new Date();
-        System.out.println(date);
+
         spinner = findViewById(R.id.spinner);
+        sqlClass = new SQL_Class();
+
         addres = "http://" + getIntent().getStringExtra("ip");
+        id_device = getIntent().getIntExtra("id_device",1);
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mass);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
         spinner.setAdapter(adapter);
-
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -66,7 +69,6 @@ public class GetActivity extends AppCompatActivity {
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
     }
@@ -82,7 +84,6 @@ public class GetActivity extends AppCompatActivity {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull Response response) throws IOException {
-
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
                         throw new IOException("Запрос к серверу не был успешен: " +
@@ -92,16 +93,14 @@ public class GetActivity extends AppCompatActivity {
                     String[]mass = temp.split("\\n");
                     for(int i = 0;i< mass.length;i++){
                         String[]mass1 = mass[i].split(",");
+
                         list_temp1.add(mass1[1]);
                         list_temp2.add(mass1[2]);
-                    }
-                    for (int j= 0;j<list_temp1.size();j++){
-                        Log.println(Log.INFO,"Date and temperature",list_temp1.get(j)+"   "+ list_temp2.get(j));
 
+                        sqlClass.sql_temp(id_device,mass1[1],mass1[2]);
                     }
                 }
             }
-
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
                 e.printStackTrace();
@@ -118,11 +117,9 @@ public class GetActivity extends AppCompatActivity {
         Request request = new Request.Builder()
                 .url(addres+ "magnet")
                 .build();
-
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull Response response) throws IOException {
-
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
                         throw new IOException("Запрос к серверу не был успешен: " +
@@ -135,14 +132,8 @@ public class GetActivity extends AppCompatActivity {
                         list_magnet1.add(mass1[1]);
                         list_magnet2.add(mass1[2]);
                     }
-                    for (int j= 0;j<list_magnet1.size();j++){
-                        Log.println(Log.INFO,"Date and magnet field",list_magnet1.get(j)+"   "+ list_magnet2.get(j));
-
-                    }
-
                 }
             }
-
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
                 e.printStackTrace();
@@ -175,31 +166,34 @@ public class GetActivity extends AppCompatActivity {
         dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         dataSet.setDrawCircles(false);
         dataSet.setDrawValues(false);
+
         LineData lineData = new LineData(dataSet);
+
         LineChart chart = findViewById(R.id.chart);
+
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         chart.getLegend().setEnabled(true);
+
         YAxis yAxis1 = chart.getAxisRight();
         yAxis1.setEnabled(false);
+
         xAxis.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
                 return sdf.format(new Date((long) value));
-
             }
         });
+
         chart.setData(lineData);
         chart.invalidate();
     }
-//OnClick кнопки для получения данных
+    //OnClick кнопки для получения данных
     public void Get_data(View view) {
         Get_temp();
         Get_magnet();
-
     }
     //OnClick кнопки для вывода данных на график
-
     public void Get_data1(View view) {
 
         switch (value){
@@ -213,13 +207,8 @@ public class GetActivity extends AppCompatActivity {
                 break;
         }
     }
-
     public void open_dialog(View view) {
-
         DialogFragment dialogFragment = new DialogFragment();
         dialogFragment.show(getSupportFragmentManager(),"tag");
-
-
     }
-
 }
