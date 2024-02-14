@@ -83,7 +83,9 @@ public class MainActivity extends AppCompatActivity {
             BluetoothDevice device = result.getDevice();
 
             if(!list.contains(device)){
-                list.add(device);
+                if(device.getName() != null) {
+                    list.add(device);
+                }
             }
             adapter.notifyDataSetChanged();
         }
@@ -106,9 +108,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 scanner.stopScan(scanCallback);
-                for(BluetoothDevice device1:list) {
-                    Log.d("FAS", device1.getAddress().toString() + "   " + device1.getName());
-                }
             }
         }, 5000);
     }

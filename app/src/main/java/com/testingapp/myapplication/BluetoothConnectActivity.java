@@ -87,19 +87,18 @@ public class BluetoothConnectActivity extends AppCompatActivity {
             String test = new String(value1, StandardCharsets.UTF_8);
             Log.i("Bluetooth", test);
 
-            if(test!= null){
+            if(test  != null){
 
                 SQL_Class sqlClass = new SQL_Class();
                 int a = 1;
                 if(sqlClass.SQL_connect()) {
-                    a = sqlClass.sql_device(device.getAddress());
+                   a = sqlClass.sql_device(device.getAddress());
+
+                   Intent intent = new Intent(BluetoothConnectActivity.this, GetActivity.class);
+                   intent.putExtra("ip", test);
+                   intent.putExtra("id_device", a);
+                   startActivity(intent);
                 }
-
-                Intent intent = new Intent(BluetoothConnectActivity.this,GetActivity.class);
-                intent.putExtra("ip",test);
-                intent.putExtra("id_device",a);
-                startActivity(intent);
-
             }
             else{
                 Toast.makeText(BluetoothConnectActivity.this,"Нет подключения к WiFi",Toast.LENGTH_SHORT).show();
@@ -120,7 +119,7 @@ public class BluetoothConnectActivity extends AppCompatActivity {
         bluetoothGatt.disconnect();
     }
     public void Connect_WiFi(View view) {
-        String value = "MGTS_GPON_852A,Hesoyam99";
+        String value = "TP-Link_2F60,83915444";
         BluetoothGattCharacteristic characteristic = characteristics.get(0);
         characteristic.setValue(value);
         bluetoothGatt.writeCharacteristic(characteristic);

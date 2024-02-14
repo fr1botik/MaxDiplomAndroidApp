@@ -33,12 +33,12 @@ public class SQL_Class {
         try {
             Class.forName(Clases);
             connection = DriverManager.getConnection(url,user,password);
-            Log.d("ASDASD","ASDASDAS");
+            Log.d("SQL_CONNECT","CONNECTED");
             connect = true;
         } catch (ClassNotFoundException e) {
             Log.e("Class not FOund",e.getMessage());
         } catch (SQLException e) {
-            Log.e("SQLException",e.getMessage());
+            Log.e("CXZCXCX",e.getMessage());
         }
         return connect;
     }
@@ -58,7 +58,7 @@ public class SQL_Class {
                     insertStatement.executeUpdate();
 
                     String query = "use "+ database+" \n SELECT * FROM Devices WHERE MAC = ?";
-                    PreparedStatement Statement = connection.prepareStatement(checkQuery);
+                    PreparedStatement Statement = connection.prepareStatement(query);
                     Statement.setString(1, mac );
                     ResultSet resultSet1 = checkStatement.executeQuery();
                     a = resultSet1.getInt(1);
@@ -82,26 +82,64 @@ public class SQL_Class {
                 PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
                 checkStatement.setString(1, Data);
                 ResultSet resultSet = checkStatement.executeQuery();
+                Log.i("bnjhbn","ASJDNASFKLA");
 
                 if (!resultSet.next()) {
                     String insertQuery ="use "+ database+" \n INSERT INTO Temperature (Data,Temperature,ID_device) VALUES (?,?,?)";
                     PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
                     insertStatement.setString(1, Data);
-                    insertStatement.setString(2, temperature);
-                    insertStatement.setString(3, String.valueOf(id_device));
+                    insertStatement.setString(2,temperature);
+                    insertStatement.setInt(3,id_device);
                     insertStatement.executeUpdate();
                 }
             } catch (SQLException e) {
                 Log.e("852",e.getMessage());
             }
         }
-
     }
-    public void sql_vibro(int id_device){
+    public void sql_vibro(int id_device,String Data,String vibro) {
+        if(connection!=null){
+            try {
+                String checkQuery = "use "+ database+" \n SELECT * FROM Vibration WHERE Data = ?";
+                PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
+                checkStatement.setString(1, Data);
+                ResultSet resultSet = checkStatement.executeQuery();
+                Log.i("bnjhbn","ASJDNASFKLA");
 
-
+                if (!resultSet.next()) {
+                    String insertQuery ="use "+ database+" \n INSERT INTO Vibration (Data,Vibration,ID_device) VALUES (?,?,?)";
+                    PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
+                    insertStatement.setString(1, Data);
+                    insertStatement.setString(2,vibro);
+                    insertStatement.setInt(3,id_device);
+                    insertStatement.executeUpdate();
+                }
+            } catch (SQLException e) {
+                Log.e("852",e.getMessage());
+            }
+        }
     }
-    public void sql_magnetic(int id_device){
+    public void sql_magnetic(int id_device,String Data,String magnetic){
+        if(connection!=null){
+            try {
+                String checkQuery = "use "+ database+" \n SELECT * FROM Magnetic WHERE Data = ?";
+                PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
+                checkStatement.setString(1, Data);
+                ResultSet resultSet = checkStatement.executeQuery();
+                Log.i("bnjhbn","ASJDNASFKLA");
+
+                if (!resultSet.next()) {
+                    String insertQuery ="use "+ database+" \n INSERT INTO Magnetic (Data,Magnetic,ID_device) VALUES (?,?,?)";
+                    PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
+                    insertStatement.setString(1, Data);
+                    insertStatement.setString(2,magnetic);
+                    insertStatement.setInt(3,id_device);
+                    insertStatement.executeUpdate();
+                }
+            } catch (SQLException e) {
+                Log.e("852",e.getMessage());
+            }
+        }
 
 
     }
