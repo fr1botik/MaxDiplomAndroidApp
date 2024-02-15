@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -34,12 +35,14 @@ public class BluetoothConnectActivity extends AppCompatActivity {
     TextView txt;
     BluetoothGattService services;
     List<BluetoothGattCharacteristic> characteristics;
+    Button btn;
 
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bluetooth_connect_activity);
+        btn = findViewById(R.id.button3);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         adress = getIntent().getStringExtra("device");
@@ -60,6 +63,7 @@ public class BluetoothConnectActivity extends AppCompatActivity {
                             gatt.discoverServices();
                     break;
                 case BluetoothProfile.STATE_DISCONNECTED:
+                    txt.setText("Подключитесь заново к устройству");
                     break;
             }
         }
@@ -101,7 +105,7 @@ public class BluetoothConnectActivity extends AppCompatActivity {
                 }
             }
             else{
-                Toast.makeText(BluetoothConnectActivity.this,"Нет подключения к WiFi",Toast.LENGTH_SHORT).show();
+                btn.setVisibility(View.VISIBLE);
             }
         }
         @Override
@@ -119,10 +123,15 @@ public class BluetoothConnectActivity extends AppCompatActivity {
         bluetoothGatt.disconnect();
     }
     public void Connect_WiFi(View view) {
-        String value = "TP-Link_2F60,83915444";
-        BluetoothGattCharacteristic characteristic = characteristics.get(0);
-        characteristic.setValue(value);
-        bluetoothGatt.writeCharacteristic(characteristic);
+        try {
+            String value = "TP-Link_2F60,83915444";
+            BluetoothGattCharacteristic characteristic = characteristics.get(0);
+            characteristic.setValue(value);
+            bluetoothGatt.writeCharacteristic(characteristic);
+        }
+        catch (Exception e){
+
+        }
 
     }
     public void Get_Ip(View view) {
