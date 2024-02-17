@@ -67,7 +67,7 @@ public class BluetoothConnectActivity extends AppCompatActivity {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
-            btn2.setClickable(true);
+
             if (status == BluetoothGatt.GATT_SUCCESS) {
 
                 for(BluetoothGattService service: gatt.getServices()) {
@@ -80,6 +80,12 @@ public class BluetoothConnectActivity extends AppCompatActivity {
                         }
                     }
                 }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        btn2.setVisibility(View.VISIBLE);
+                    }
+                });
             }
         }
         @Override
@@ -102,7 +108,12 @@ public class BluetoothConnectActivity extends AppCompatActivity {
                 }
             }
             else{
-                btn.setVisibility(View.VISIBLE);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        btn.setVisibility(View.VISIBLE);
+                    }
+                });
             }
         }
         @Override

@@ -14,11 +14,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.io.IOException;
@@ -236,16 +238,18 @@ public class GetActivity extends AppCompatActivity {
                         throw new IOException("Запрос к серверу не был успешен: " +
                                 response.code() + " " + response.message());
                     }
-                    vibro = responseBody.string();
-                    String[]mass = vibro.split("\\n");
+                    String fft = responseBody.string();
+                    String[]mass = fft.split("\\n");
                     datas datas = new datas();
                     datas.setDate("0");
+                    datas.setTime("v");
                     datas.setData("0");
                     list_FFT.add(datas);
-                    for(int i = 1;i< list_FFT.size()-1;i++){
-                        String[]mass1 = mass[i].split("\\t");
+                    for(int i = 1;i< mass.length-1;i++){
+                        String[]mass1 = mass[i].split(",");
                         datas =new datas();
                         datas.setDate(mass1[0]);
+                        datas.setTime("v");
                         datas.setData(mass1[1]);
                         list_FFT.add(datas);
                     }
@@ -294,12 +298,10 @@ public class GetActivity extends AppCompatActivity {
         XAxis xAxis = chart.getXAxis();
         xAxis.setAxisLineColor(Color.parseColor("#082567"));
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        chart.getLegend().setEnabled(true);
 
         YAxis yAxis1 = chart.getAxisRight();
         yAxis1.setAxisLineColor(Color.parseColor("#cd7f32"));
         yAxis1.setEnabled(false);
-
         xAxis.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
@@ -320,13 +322,12 @@ public class GetActivity extends AppCompatActivity {
             yValues[i]= Float.parseFloat((list.get(i).getData()));
         }
 
-        ArrayList<Entry> entries = new ArrayList<>();
+        ArrayList<Entry> entrie = new ArrayList<>();
 
         for (int i = 0; i < list.size(); i++) {
-            entries.add(new Entry(xValues[i],yValues[i]));
+            entrie.add(new Entry(xValues[i],yValues[i]));
         }
-        LineDataSet dataSet = new LineDataSet(entries, "Label");
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        LineDataSet dataSet = new LineDataSet(entrie, "FFT");
         dataSet.setDrawCircles(false);
         dataSet.setDrawValues(false);
 
@@ -335,18 +336,16 @@ public class GetActivity extends AppCompatActivity {
         LineChart chart = findViewById(R.id.chart);
 
         XAxis xAxis = chart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        chart.getLegend().setEnabled(true);
-
-        YAxis yAxis1 = chart.getAxisRight();
-        yAxis1.setEnabled(false);
-
         xAxis.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                return sdf.format(new Date((long) value));
+                return String.valueOf(value);
             }
         });
+
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        YAxis yAxis1 = chart.getAxisRight();
+        yAxis1.setEnabled(false);
 
         chart.setData(lineData);
         chart.invalidate();
@@ -358,7 +357,6 @@ public class GetActivity extends AppCompatActivity {
             Get_temp();
             Get_magnet();
             Get_vibro();
-
         }
         catch (Exception e){}
 
