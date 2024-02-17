@@ -10,21 +10,13 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ExpandableListView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BluetoothConnectActivity extends AppCompatActivity {
@@ -35,7 +27,7 @@ public class BluetoothConnectActivity extends AppCompatActivity {
     TextView txt;
     BluetoothGattService services;
     List<BluetoothGattCharacteristic> characteristics;
-    Button btn;
+    Button btn,btn2;
 
     @SuppressLint("MissingPermission")
     @Override
@@ -43,6 +35,7 @@ public class BluetoothConnectActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bluetooth_connect_activity);
         btn = findViewById(R.id.button3);
+        btn2 = findViewById(R.id.button4);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         adress = getIntent().getStringExtra("device");
@@ -61,6 +54,7 @@ public class BluetoothConnectActivity extends AppCompatActivity {
             switch (newState) {
                 case BluetoothProfile.STATE_CONNECTED:
                             gatt.discoverServices();
+                            btn2.setVisibility(View.VISIBLE);
                     break;
                 case BluetoothProfile.STATE_DISCONNECTED:
                     txt.setText("Подключитесь заново к устройству");
@@ -94,10 +88,8 @@ public class BluetoothConnectActivity extends AppCompatActivity {
             if(test  != null){
 
                 SQL_Class sqlClass = new SQL_Class();
-                int a = 1;
                 if(sqlClass.SQL_connect()) {
-                   a = sqlClass.sql_device(device.getAddress());
-
+                   int a = sqlClass.sql_device(device.getAddress());
                    Intent intent = new Intent(BluetoothConnectActivity.this, GetActivity.class);
                    intent.putExtra("ip", test);
                    intent.putExtra("id_device", a);
@@ -117,11 +109,13 @@ public class BluetoothConnectActivity extends AppCompatActivity {
             super.onCharacteristicChanged(gatt, characteristic, value);
         }
     };
+    @SuppressLint("MissingPermission")
     @Override
     protected void onDestroy() {
         super.onDestroy();
         bluetoothGatt.disconnect();
     }
+    @SuppressLint("MissingPermission")
     public void Connect_WiFi(View view) {
         try {
             String value = "TP-Link_2F60,83915444";
@@ -134,6 +128,7 @@ public class BluetoothConnectActivity extends AppCompatActivity {
         }
 
     }
+    @SuppressLint("MissingPermission")
     public void Get_Ip(View view) {
         BluetoothGattCharacteristic characteristic = characteristics.get(1);
         bluetoothGatt.readCharacteristic(characteristic);

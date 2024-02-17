@@ -7,24 +7,17 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,16 +57,7 @@ public class MainActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
     }
     private void permission(){
-
-        if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            if (checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{android.Manifest.permission.BLUETOOTH_SCAN}, 1);
-                if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, 1);
-                }
-            }
-        }
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}, 1);
     }
     private ScanCallback scanCallback = new ScanCallback() {
         @SuppressLint("MissingPermission")
@@ -102,13 +86,18 @@ public class MainActivity extends AppCompatActivity {
     public void click(View view){
         list.clear();
         adapter.notifyDataSetChanged();
+        if(bluetoothAdapter.isEnabled()) {
 
-        scanner.startScan(scanCallback);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                scanner.stopScan(scanCallback);
-            }
-        }, 5000);
+            scanner.startScan(scanCallback);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    scanner.stopScan(scanCallback);
+                }
+            }, 5000);
+        }
+        else {
+            Toast.makeText(MainActivity.this,"Включите блюзут!",Toast.LENGTH_SHORT).show();
+        }
     }
 }
