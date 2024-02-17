@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -100,7 +101,8 @@ public class GetActivity extends AppCompatActivity {
                     for(int i = 0;i< mass.length;i++){
                         String[]mass1 = mass[i].split(",");
                         datas datas = new datas();
-                        datas.setDate(mass1[1]);
+                        datas.setDate(mass1[0]);
+                        datas.setTime(mass1[1]);
                         datas.setData(mass1[2]);
                         list_temp.add(datas);
 
@@ -108,7 +110,7 @@ public class GetActivity extends AppCompatActivity {
                     for(int i = 0;i< list_temp.size();i++){
                         try {
                             if(sqlClass.SQL_connect()) {
-                                sqlClass.sql_temp(id_device, list_temp.get(i).getDate(), list_temp.get(i).getData());
+                                sqlClass.sql_temp(id_device, list_temp.get(i).getDate(), list_temp.get(i).getData(),list_temp.get(i).getTime());
                             }
                         }catch (Exception e){
 
@@ -147,7 +149,8 @@ public class GetActivity extends AppCompatActivity {
                     for(int i = 0;i< mass.length;i++){
                         String[]mass1 = mass[i].split(",");
                         datas datas = new datas();
-                        datas.setDate(mass1[1]);
+                        datas.setDate(mass1[0]);
+                        datas.setTime(mass1[1]);
                         datas.setData(mass1[2]);
                         list_magnet.add(datas);
 
@@ -156,7 +159,7 @@ public class GetActivity extends AppCompatActivity {
                     for(int i = 0;i<list_magnet.size();i++){
                        try {
                            if(sqlClass.SQL_connect()) {
-                               sqlClass.sql_magnetic(id_device, list_magnet.get(i).getDate(), list_magnet.get(i).getData());
+                               sqlClass.sql_magnetic(id_device, list_magnet.get(i).getDate(), list_magnet.get(i).getData(),list_magnet.get(i).getTime());
                            }
                        }
                        catch (Exception e){
@@ -195,14 +198,15 @@ public class GetActivity extends AppCompatActivity {
                     for(int i = 1;i< mass.length-1;i++){
                         String[]mass1 = mass[i].split(",");
                         datas datas = new datas();
-                        datas.setDate(mass1[1]);
+                        datas.setDate(mass1[0]);
+                        datas.setTime(mass1[1]);
                         datas.setData(mass1[2]);
                         list_vibro.add(datas);
                     }
                     for(int i = 0;i<list_vibro.size();i++) {
                         try {
                             if (sqlClass.SQL_connect()) {
-                                sqlClass.sql_vibro(id_device, list_vibro.get(i).getDate(), list_vibro.get(i).getData());
+                                sqlClass.sql_vibro(id_device, list_vibro.get(i).getDate(), list_vibro.get(i).getData(),list_vibro.get(i).getTime());
                             }
                         } catch (Exception e) {
                             break;
@@ -234,15 +238,15 @@ public class GetActivity extends AppCompatActivity {
                     }
                     vibro = responseBody.string();
                     String[]mass = vibro.split("\\n");
-                    datas datas1 = new datas();
-                    datas1.setDate("0");
-                    datas1.setData("0");
-                    list_FFT.add(datas1);
+                    datas datas = new datas();
+                    datas.setDate("0");
+                    datas.setData("0");
+                    list_FFT.add(datas);
                     for(int i = 1;i< list_FFT.size()-1;i++){
                         String[]mass1 = mass[i].split("\\t");
-                        datas datas = new datas();
-                        datas.setDate(mass1[1]);
-                        datas.setData(mass1[2]);
+                        datas =new datas();
+                        datas.setDate(mass1[0]);
+                        datas.setData(mass1[1]);
                         list_FFT.add(datas);
                     }
                 }
@@ -262,13 +266,16 @@ public class GetActivity extends AppCompatActivity {
 
         for (int i=0;i<list.size();i++){
             try {
-                date = sdf.parse(list.get(i).getDate());
+
+                date = sdf.parse(list.get(i).getTime());
+                long timestamp = date.getTime();
+                xValues[i]= timestamp;
+                yValues[i]= Float.parseFloat((list.get(i).getData()));
+
             } catch (ParseException e) {
-                throw new RuntimeException(e);
+                Log.d("VSSDFVCX",e.getMessage());
             }
-            long timestamp = date.getTime();
-            xValues[i]= timestamp;
-            yValues[i]= Float.parseFloat((list.get(i).getData()));
+
         }
         ArrayList<Entry> entries = new ArrayList<>();
 
@@ -347,10 +354,11 @@ public class GetActivity extends AppCompatActivity {
     //OnClick кнопки для получения данных
     public void Get_data(View view) {
         try {
+            Get_FFT();
             Get_temp();
             Get_magnet();
             Get_vibro();
-            Get_FFT();
+
         }
         catch (Exception e){}
 

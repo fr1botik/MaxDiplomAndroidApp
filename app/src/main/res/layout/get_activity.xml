@@ -10,7 +10,6 @@
         android:id="@+id/chart"
         android:layout_width="match_parent"
         android:layout_height="234dp"
-        android:background="#E1F109"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"

@@ -3,6 +3,16 @@ package com.testingapp.myapplication;
 public class datas {
 
     private String Date;
+
+    public String getTime() {
+        return Time;
+    }
+
+    public void setTime(String time) {
+        Time = time;
+    }
+
+    private String Time;
     private String Data;
 
 

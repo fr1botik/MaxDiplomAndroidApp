@@ -14,10 +14,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
 
 public class SQL_Class {
 
-    private static String ip = "192.168.77.115";
+    private static String ip = "192.168.5.67";
     private static String  port= "61344";
     private static String Clases = "net.sourceforge.jtds.jdbc.Driver";
     private static String database = "IoT_device";
@@ -61,7 +62,7 @@ public class SQL_Class {
                     PreparedStatement Statement = connection.prepareStatement(query);
                     Statement.setString(1, mac );
                     ResultSet resultSet1 = checkStatement.executeQuery();
-                    a = resultSet1.getInt(1);
+                    a = resultSet1.getInt(2);
                 }
                 else{
                     a = resultSet.getInt(1);
@@ -74,22 +75,23 @@ public class SQL_Class {
         }
         return a;
     }
-    public void sql_temp(int id_device,String Data,String temperature){
+    public void sql_temp(int id_device,String Data,String temperature,String time){
 
         if(connection!=null){
             try {
-                String checkQuery = "use "+ database+" \n SELECT * FROM Temperature WHERE Data = ?";
+                String checkQuery = "use "+ database+" \n SELECT * FROM Temperature WHERE Time = ?";
                 PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
-                checkStatement.setString(1, Data);
+                checkStatement.setString(1, time);
                 ResultSet resultSet = checkStatement.executeQuery();
                 Log.i("bnjhbn","ASJDNASFKLA");
 
                 if (!resultSet.next()) {
-                    String insertQuery ="use "+ database+" \n INSERT INTO Temperature (Data,Temperature,ID_device) VALUES (?,?,?)";
+                    String insertQuery ="use "+ database+" \n INSERT INTO Temperature (Date,Time,Temperature,ID_device) VALUES (?,?,?,?)";
                     PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
                     insertStatement.setString(1, Data);
-                    insertStatement.setString(2,temperature);
-                    insertStatement.setInt(3,id_device);
+                    insertStatement.setString(2, time);
+                    insertStatement.setString(3,temperature);
+                    insertStatement.setInt(4,id_device);
                     insertStatement.executeUpdate();
                 }
             } catch (SQLException e) {
@@ -97,21 +99,22 @@ public class SQL_Class {
             }
         }
     }
-    public void sql_vibro(int id_device,String Data,String vibro) {
+    public void sql_vibro(int id_device,String Data,String vibro,String time) {
         if(connection!=null){
             try {
-                String checkQuery = "use "+ database+" \n SELECT * FROM Vibration WHERE Data = ?";
+                String checkQuery = "use "+ database+" \n SELECT * FROM Vibration WHERE Time = ?";
                 PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
-                checkStatement.setString(1, Data);
+                checkStatement.setString(1, time);
                 ResultSet resultSet = checkStatement.executeQuery();
                 Log.i("bnjhbn","ASJDNASFKLA");
 
                 if (!resultSet.next()) {
-                    String insertQuery ="use "+ database+" \n INSERT INTO Vibration (Data,Vibration,ID_device) VALUES (?,?,?)";
+                    String insertQuery ="use "+ database+" \n INSERT INTO Vibration (Date,Time,Vibration,ID_device) VALUES (?,?,?,?)";
                     PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
                     insertStatement.setString(1, Data);
-                    insertStatement.setString(2,vibro);
-                    insertStatement.setInt(3,id_device);
+                    insertStatement.setString(2, time);
+                    insertStatement.setString(3,vibro);
+                    insertStatement.setInt(4,id_device);
                     insertStatement.executeUpdate();
                 }
             } catch (SQLException e) {
@@ -119,21 +122,22 @@ public class SQL_Class {
             }
         }
     }
-    public void sql_magnetic(int id_device,String Data,String magnetic){
+    public void sql_magnetic(int id_device,String Data,String magnetic,String time){
         if(connection!=null){
             try {
-                String checkQuery = "use "+ database+" \n SELECT * FROM Magnetic WHERE Data = ?";
+                String checkQuery = "use "+ database+" \n SELECT * FROM Magnetic WHERE Time = ?";
                 PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
-                checkStatement.setString(1, Data);
+                checkStatement.setString(1, time);
                 ResultSet resultSet = checkStatement.executeQuery();
                 Log.i("bnjhbn","ASJDNASFKLA");
 
                 if (!resultSet.next()) {
-                    String insertQuery ="use "+ database+" \n INSERT INTO Magnetic (Data,Magnetic,ID_device) VALUES (?,?,?)";
+                    String insertQuery ="use "+ database+" \n INSERT INTO Magnetic (Date,Time,Magnetic,ID_device) VALUES (?,?,?,?)";
                     PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
                     insertStatement.setString(1, Data);
-                    insertStatement.setString(2,magnetic);
-                    insertStatement.setInt(3,id_device);
+                    insertStatement.setString(2, time);
+                    insertStatement.setString(3,magnetic);
+                    insertStatement.setInt(4,id_device);
                     insertStatement.executeUpdate();
                 }
             } catch (SQLException e) {

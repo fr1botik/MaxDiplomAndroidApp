@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import java.nio.charset.StandardCharsets;
@@ -34,7 +36,7 @@ public class BluetoothConnectActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bluetooth_connect_activity);
-        btn = findViewById(R.id.button3);
+        btn = findViewById(R.id.bta);
         btn2 = findViewById(R.id.button4);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -54,17 +56,20 @@ public class BluetoothConnectActivity extends AppCompatActivity {
             switch (newState) {
                 case BluetoothProfile.STATE_CONNECTED:
                             gatt.discoverServices();
-                            btn2.setVisibility(View.VISIBLE);
+
                     break;
                 case BluetoothProfile.STATE_DISCONNECTED:
                     txt.setText("Подключитесь заново к устройству");
                     break;
             }
+
         }
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
+            btn2.setClickable(true);
             if (status == BluetoothGatt.GATT_SUCCESS) {
+
                 for(BluetoothGattService service: gatt.getServices()) {
                     if (!service.getUuid().toString().startsWith("000018"))
                     {   services = gatt.getService(service.getUuid());
@@ -83,10 +88,10 @@ public class BluetoothConnectActivity extends AppCompatActivity {
 
             byte[] value1 = characteristic.getValue();
             String test = new String(value1, StandardCharsets.UTF_8);
-            Log.i("Bluetooth", test);
+            Log.i("pppqqww", test);
 
-            if(test  != null){
-
+            if(!test.equals("boob"))
+            {
                 SQL_Class sqlClass = new SQL_Class();
                 if(sqlClass.SQL_connect()) {
                    int a = sqlClass.sql_device(device.getAddress());
@@ -118,13 +123,12 @@ public class BluetoothConnectActivity extends AppCompatActivity {
     @SuppressLint("MissingPermission")
     public void Connect_WiFi(View view) {
         try {
-            String value = "TP-Link_2F60,83915444";
+            String value = "MGTS_GPON_0134,EFY35V9T";
             BluetoothGattCharacteristic characteristic = characteristics.get(0);
             characteristic.setValue(value);
             bluetoothGatt.writeCharacteristic(characteristic);
         }
         catch (Exception e){
-
         }
 
     }
@@ -132,6 +136,5 @@ public class BluetoothConnectActivity extends AppCompatActivity {
     public void Get_Ip(View view) {
         BluetoothGattCharacteristic characteristic = characteristics.get(1);
         bluetoothGatt.readCharacteristic(characteristic);
-
     }
 }

@@ -38,7 +38,7 @@
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/bta"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="Connect_WiFi"
@@ -53,10 +53,11 @@
     <Button
         android:id="@+id/button4"
         android:layout_width="wrap_content"
+        android:clickable="false"
         android:layout_height="wrap_content"
         android:onClick="Get_Ip"
         android:text="Проверить подключение к Wifi"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.474"
