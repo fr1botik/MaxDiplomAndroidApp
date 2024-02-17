@@ -108,6 +108,8 @@ public class BluetoothConnectActivity extends AppCompatActivity {
                 }
             }
             else{
+
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
