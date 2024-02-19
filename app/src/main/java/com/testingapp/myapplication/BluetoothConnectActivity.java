@@ -13,15 +13,18 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.List;
 
-public class BluetoothConnectActivity extends AppCompatActivity {
+public class BluetoothConnectActivity extends AppCompatActivity implements DialogSettingsFragment.OnDataChangeListener {
     BluetoothGatt bluetoothGatt;
     BluetoothAdapter bluetoothAdapter;
     BluetoothDevice device;
@@ -29,15 +32,15 @@ public class BluetoothConnectActivity extends AppCompatActivity {
     TextView txt;
     BluetoothGattService services;
     List<BluetoothGattCharacteristic> characteristics;
-    Button btn,btn2;
+    Button btn_wifi,btn_check_wifi,btn_settings,btn_graphics,btn_send_base_info;
+    LinearLayout base_info;
 
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bluetooth_connect_activity);
-        btn = findViewById(R.id.bta);
-        btn2 = findViewById(R.id.button4);
+        init();
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         adress = getIntent().getStringExtra("device");
@@ -46,7 +49,18 @@ public class BluetoothConnectActivity extends AppCompatActivity {
 
         txt = findViewById(R.id.info);
 
-        txt.setText(device.getAddress() + "\n" + device.getName());
+    }
+
+    private void init(){
+
+        btn_wifi = findViewById(R.id.Connect_WiFi);
+        btn_check_wifi = findViewById(R.id.Check_WiFi_Connect);
+        btn_send_base_info = findViewById(R.id.Send_Base_Info);
+        btn_settings = findViewById(R.id.Settings);
+        btn_graphics = findViewById(R.id.Graphics);
+        base_info = findViewById(R.id.layout_base);
+
+
     }
     private BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
         @SuppressLint("MissingPermission")
@@ -64,6 +78,7 @@ public class BluetoothConnectActivity extends AppCompatActivity {
             }
 
         }
+        @SuppressLint("MissingPermission")
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
@@ -74,17 +89,13 @@ public class BluetoothConnectActivity extends AppCompatActivity {
                     if (!service.getUuid().toString().startsWith("000018"))
                     {   services = gatt.getService(service.getUuid());
                         characteristics  = services.getCharacteristics();
-                        Log.d("zxc","SERVICE UUID " + services.getUuid());
-                        for (BluetoothGattCharacteristic characteristic: characteristics){
-                            Log.d("zxc","CUSTOM " + characteristic.getUuid().toString());
-                        }
                     }
                 }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        btn2.setVisibility(View.VISIBLE);
-                    }
+                runOnUiThread(() -> {
+                    btn_settings.setVisibility(View.VISIBLE);
+                    btn_graphics.setVisibility(View.VISIBLE);
+                    BluetoothGattCharacteristic characteristic = characteristics.get(2);
+                    bluetoothGatt.readCharacteristic(characteristic);
                 });
             }
         }
@@ -94,9 +105,8 @@ public class BluetoothConnectActivity extends AppCompatActivity {
 
             byte[] value1 = characteristic.getValue();
             String test = new String(value1, StandardCharsets.UTF_8);
-            Log.i("pppqqww", test);
 
-            if(!test.equals("boob"))
+            if(!test.equals("boob") && !characteristic.equals(characteristics.get(2)))
             {
                 SQL_Class sqlClass = new SQL_Class();
                 if(sqlClass.SQL_connect()) {
@@ -107,15 +117,11 @@ public class BluetoothConnectActivity extends AppCompatActivity {
                    startActivity(intent);
                 }
             }
-            else{
+            else if(characteristic.equals(characteristics.get(2)))
+            {
+                String [] mass = test.split(",");
+                txt.setText(MessageFormat.format("SN:{0}\tЦех:{1}\tЗавод:{2}", mass[0], mass[1], mass[2]));
 
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        btn.setVisibility(View.VISIBLE);
-                    }
-                });
             }
         }
         @Override
@@ -135,13 +141,24 @@ public class BluetoothConnectActivity extends AppCompatActivity {
     }
     @SuppressLint("MissingPermission")
     public void Connect_WiFi(View view) {
-        try {
-            String value = "MGTS_GPON_0134,EFY35V9T";
-            BluetoothGattCharacteristic characteristic = characteristics.get(0);
-            characteristic.setValue(value);
-            bluetoothGatt.writeCharacteristic(characteristic);
+
+        EditText login,password;
+        login = findViewById(R.id.Login);
+        password = findViewById(R.id.Password);
+        if(!login.getText().equals("") && !password.getText().equals("") ) {
+            String wifi = login.getText() + "," + password.getText();
+
+            try {
+                BluetoothGattCharacteristic characteristic = characteristics.get(0);
+                characteristic.setValue(wifi);
+                bluetoothGatt.writeCharacteristic(characteristic);
+                LinearLayout wifi_conn = findViewById(R.id.wifi_conn);
+                wifi_conn.setVisibility(View.GONE);
+            } catch (Exception e) {
+            }
         }
-        catch (Exception e){
+        else {
+            Toast.makeText(BluetoothConnectActivity.this,"Введите название сети и пароль!",Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -149,5 +166,41 @@ public class BluetoothConnectActivity extends AppCompatActivity {
     public void Get_Ip(View view) {
         BluetoothGattCharacteristic characteristic = characteristics.get(1);
         bluetoothGatt.readCharacteristic(characteristic);
+    }
+
+    public void show(View view) {
+        LinearLayout wifi_conn = findViewById(R.id.wifi_conn);
+        wifi_conn.setVisibility(View.VISIBLE);
+    }
+
+    @SuppressLint("MissingPermission")
+    public void click(View view) {
+
+    }
+
+    @SuppressLint("MissingPermission")
+    public void send_info(View view) {
+
+        BluetoothGattCharacteristic characteristic = characteristics.get(2);
+        characteristic.setValue("Значение1,Значение2,Значение3");
+        bluetoothGatt.writeCharacteristic(characteristic);
+    }
+
+    @Override
+    public void onDataChanged(int setting) {
+
+        btn_settings.setVisibility(View.GONE);
+        btn_graphics.setVisibility(View.VISIBLE);
+        switch (setting){
+
+            case 0:
+                btn_wifi.setVisibility(View.VISIBLE);
+
+                break;
+            case 1:
+
+                break;
+
+        }
     }
 }
