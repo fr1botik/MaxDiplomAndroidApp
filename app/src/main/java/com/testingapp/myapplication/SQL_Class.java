@@ -10,6 +10,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SQL_Class {
 
@@ -87,7 +89,6 @@ public class SQL_Class {
                 PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
                 checkStatement.setString(1, time);
                 ResultSet resultSet = checkStatement.executeQuery();
-                Log.i("bnjhbn","ASJDNASFKLA");
 
                 if (!resultSet.next()) {
                     String insertQuery ="use "+ database+" \n INSERT INTO Temperature (Date,Time,Temperature,ID_device) VALUES (?,?,?,?)";
@@ -110,7 +111,6 @@ public class SQL_Class {
                 PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
                 checkStatement.setString(1, time);
                 ResultSet resultSet = checkStatement.executeQuery();
-                Log.i("bnjhbn","ASJDNASFKLA");
 
                 if (!resultSet.next()) {
                     String insertQuery ="use "+ database+" \n INSERT INTO Vibration (Date,Time,Vibration,ID_device) VALUES (?,?,?,?)";
@@ -133,7 +133,6 @@ public class SQL_Class {
                 PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
                 checkStatement.setString(1, time);
                 ResultSet resultSet = checkStatement.executeQuery();
-                Log.i("bnjhbn","ASJDNASFKLA");
 
                 if (!resultSet.next()) {
                     String insertQuery ="use "+ database+" \n INSERT INTO Magnetic (Date,Time,Magnetic,ID_device) VALUES (?,?,?,?)";
@@ -149,6 +148,79 @@ public class SQL_Class {
             }
         }
 
+
+    }
+    public List<SQL_data> sql_get_data(int table, String Data, String time_start, String time_end) {
+        List<SQL_data> dataList = new ArrayList<>();
+        if (connection != null) {
+        switch (table) {
+            case 0:
+                try {
+                String checkQuery = "use " + database + " \n SELECT * FROM Temperature WHERE Date = ? AND Time BETWEEN ? AND ? ";
+                PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
+                checkStatement.setString(1, Data);
+                checkStatement.setString(2, time_start);
+                checkStatement.setString(3, time_end);
+                ResultSet resultSet = checkStatement.executeQuery();
+
+                while (resultSet.next()){
+                    SQL_data sql_data = new SQL_data();
+                    sql_data.setTime(resultSet.getString("Time"));
+                    sql_data.setData(resultSet.getString("Temperature"));
+                    dataList.add(sql_data);
+                 }
+
+                 }
+                catch (SQLException e) {
+                Log.e("852", e.getMessage());
+
+                }
+                break;
+            case 1:
+                try {
+                    String checkQuery = "use " + database + " \n SELECT * FROM Magnetic WHERE Date = ? AND Time BETWEEN ? AND ? ";
+                    PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
+                    checkStatement.setString(1, Data);
+                    checkStatement.setString(2, time_start);
+                    checkStatement.setString(3, time_end);
+                    ResultSet resultSet = checkStatement.executeQuery();
+                    while (resultSet.next()){
+                        SQL_data sql_data = new SQL_data();
+                        sql_data.setTime(resultSet.getString("Time"));
+                        sql_data.setData(resultSet.getString("Magnetic"));
+                        dataList.add(sql_data);
+                    }
+                }
+                catch (SQLException e) {
+                    Log.e("852", e.getMessage());
+
+                }
+                break;
+            case 2:
+                try {
+                    String checkQuery = "use " + database + " \n SELECT * FROM Vibration WHERE Date = ? AND Time BETWEEN ? AND ? ";
+                    PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
+                    checkStatement.setString(1, Data);
+                    checkStatement.setString(2, time_start);
+                    checkStatement.setString(3, time_end);
+                    ResultSet resultSet = checkStatement.executeQuery();
+
+                    while (resultSet.next()){
+                        SQL_data sql_data = new SQL_data();
+                        sql_data.setTime(resultSet.getString("Time"));
+                        sql_data.setData(resultSet.getString("Vibration"));
+                        dataList.add(sql_data);
+                    }
+
+                }
+                catch (SQLException e) {
+                    Log.e("852", e.getMessage());
+
+                }
+                break;
+            }
+        }
+        return dataList;
 
     }
     public void setIpAddress(String newIp) {

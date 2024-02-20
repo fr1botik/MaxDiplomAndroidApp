@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -44,15 +46,24 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
     Date date;
     int id_device;
+    SQL_Class sqlClass;
     Spinner spinner;
-    String value,temp,magnet,vibro,addres;
+    String value,temp,magnet,vibro,addres,current_date,time_start,time_end;
 
 
     //Инициализация приложения
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sqlClass =  new SQL_Class(getApplicationContext());
         setContentView(R.layout.get_activity);
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
+
+        current_date = sdf.format(calendar.getTime());
+        time_start = "00:00:00";
+        time_end = "23:59:59";
+
 
         mass = new String[]{"temp", "magnet", "vibro","FFT"};
 
@@ -78,6 +89,21 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
             }
         });
     }
+
+    @Override
+    public void getData(String date) {
+        current_date = date;
+        Log.d("Data",current_date);
+
+    }
+    @Override
+    public void getTime(String date_start,String date_end) {
+        time_start = date_start;
+        time_end = date_end;
+
+        Log.d("Data",time_start +"\t" + time_end);
+
+    }
     //GET-запрос на получение данных температуры
     private void Get_temp(){
 
@@ -96,7 +122,7 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
                     }
                     temp = responseBody.string();
                     String[]mass = temp.split("\\r\\n");
-                    SQL_Class sqlClass = new SQL_Class(getApplicationContext());
+
                     for(int i = 0;i< mass.length;i++){
                         String[]mass1 = mass[i].split(",");
                         datas datas = new datas();
@@ -144,7 +170,6 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
                     }
                     magnet = responseBody.string();
                     String[]mass = magnet.split("\\n");
-                    SQL_Class sqlClass = new SQL_Class(getApplicationContext());
                     for(int i = 0;i< mass.length;i++){
                         String[]mass1 = mass[i].split(",");
                         datas datas = new datas();
@@ -152,7 +177,6 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
                         datas.setTime(mass1[1]);
                         datas.setData(mass1[2]);
                         list_magnet.add(datas);
-
 
                     }
                     for(int i = 0;i<list_magnet.size();i++){
@@ -193,7 +217,7 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
                     }
                     vibro = responseBody.string();
                     String[]mass = vibro.split("\\n");
-                    SQL_Class sqlClass = new SQL_Class(getApplicationContext());
+
                     for(int i = 1;i< mass.length-1;i++){
                         String[]mass1 = mass[i].split(",");
                         datas datas = new datas();
@@ -260,7 +284,7 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
         });
     }
     //Вывод графика с полученными данными
-    private void Set_grapsh(List<datas> list){
+    private void Set_grapsh(List<SQL_data> list){
 
         double[] xValues = new double[list.size()];
         double[] yValues = new double[list.size()];
@@ -363,13 +387,25 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
 
         switch (value){
             case "temp":
-                Set_grapsh(list_temp);
+                if(sqlClass.SQL_connect()) {
+                    List<SQL_data> sql_data;
+                    sql_data = sqlClass.sql_get_data(0, current_date, time_start, time_end);
+                    Set_grapsh(sql_data);
+                }
                 break;
             case "magnet":
-                Set_grapsh(list_magnet);
+                if(sqlClass.SQL_connect()) {
+                    List<SQL_data> sql_data;
+                    sql_data = sqlClass.sql_get_data(1, current_date, time_start, time_end);
+                    Set_grapsh(sql_data);
+                }
                 break;
             case "vibro":
-                Set_grapsh(list_vibro);
+                if(sqlClass.SQL_connect()) {
+                    List<SQL_data> sql_data;
+                    sql_data = sqlClass.sql_get_data(2, current_date, time_start, time_end);
+                    Set_grapsh(sql_data);
+                }
                 break;
             case "FFT":
                 Set_FFT(list_FFT);
@@ -377,6 +413,7 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
             default:
                 break;
         }
+
     }
     public void diapozon(View view) {
         DialogGetGraphics dialogGetGraphics = new DialogGetGraphics();
@@ -384,13 +421,5 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
 
     }
 
-    @Override
-    public void getData(String date) {
 
-    }
-
-    @Override
-    public void getTime(String date_start,String date_end) {
-
-    }
 }

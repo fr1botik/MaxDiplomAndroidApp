@@ -15,6 +15,8 @@ import androidx.fragment.app.DialogFragment;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class TimePickerFragment extends DialogFragment {
 
@@ -29,20 +31,25 @@ public class TimePickerFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
         TimePicker startTimePicker = view.findViewById(R.id.start_time_picker);
+        startTimePicker.setIs24HourView(true);
         TimePicker endTimePicker = view.findViewById(R.id.end_time_picker);
+        endTimePicker.setIs24HourView(true);
+
         Button okButton = view.findViewById(R.id.ok_button);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Обработка нажатия на кнопку OK
                 // Получите выбранные значения времени начала и окончания
-                int startHour = startTimePicker.getHour();
-                int startMinute = startTimePicker.getMinute();
-                int endHour = endTimePicker.getHour();
-                int endMinute = endTimePicker.getMinute();
+                SimpleDateFormat sdf = new SimpleDateFormat("HH", Locale.getDefault());
+                String time_start = sdf.format(new Date(0,0,0,startTimePicker.getHour(),0)) + ":" + startTimePicker.getMinute() + ":00";
+                String time_end = sdf.format(new Date(0,0,0,endTimePicker.getHour(),0)) + ":" + endTimePicker.getMinute() + ":00";
 
-                // Пример вывода выбранного периода времени
-                Log.d("TimePicker", "Выбранный период времени: " + startHour + ":" + startMinute + " - " + endHour + ":" + endMinute);
+
+                if (getActivity() instanceof TimePickerFragment.getTimeInterface) {
+                    ((TimePickerFragment.getTimeInterface) getActivity()).getTime(time_start,time_end);
+                    dismiss();
+                }
 
                 dismiss(); // Закрыть диалоговое окно
             }
