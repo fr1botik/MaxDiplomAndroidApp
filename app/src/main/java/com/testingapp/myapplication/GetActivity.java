@@ -24,6 +24,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.io.IOException;
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-public class GetActivity extends AppCompatActivity {
+public class GetActivity extends AppCompatActivity  implements DataPickerFragment.getDataInterface, TimePickerFragment.getTimeInterface {
 
     //Объявление переменных
     OkHttpClient client;
@@ -381,8 +382,14 @@ public class GetActivity extends AppCompatActivity {
                 break;
         }
     }
-    public void open_dialog(View view) {
-        DialogFragment dialogFragment = new DialogFragment();
-        dialogFragment.show(getSupportFragmentManager(),"tag");
+
+    @Override
+    public void getData(String date) {
+
+    }
+
+    @Override
+    public void getTime(String date) {
+
     }
 }

@@ -28,12 +28,13 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
     BluetoothGatt bluetoothGatt;
     BluetoothAdapter bluetoothAdapter;
     BluetoothDevice device;
-    String adress;
+    String adress,test;
     TextView txt;
     BluetoothGattService services;
     List<BluetoothGattCharacteristic> characteristics;
-    Button btn_wifi,btn_check_wifi,btn_settings,btn_graphics,btn_send_base_info;
-    LinearLayout base_info;
+    Button btn_wifi,btn_settings,btn_graphics,btn_back;
+    LinearLayout base_info,set_base_info,wifi_conn;
+    Intent intent;
 
     @SuppressLint("MissingPermission")
     @Override
@@ -54,12 +55,13 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
     private void init(){
 
         btn_wifi = findViewById(R.id.Connect_WiFi);
-        btn_check_wifi = findViewById(R.id.Check_WiFi_Connect);
-        btn_send_base_info = findViewById(R.id.Send_Base_Info);
         btn_settings = findViewById(R.id.Settings);
         btn_graphics = findViewById(R.id.Graphics);
         base_info = findViewById(R.id.layout_base);
-
+        wifi_conn = findViewById(R.id.wifi_conn);
+        btn_back = findViewById(R.id.back_btn);
+        set_base_info = findViewById(R.id.layout_base_info);
+        intent = new Intent(BluetoothConnectActivity.this, GetActivity.class);
 
     }
     private BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
@@ -104,17 +106,18 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
             super.onCharacteristicRead(gatt, characteristic, status);
 
             byte[] value1 = characteristic.getValue();
-            String test = new String(value1, StandardCharsets.UTF_8);
+             test = new String(value1, StandardCharsets.UTF_8);
 
             if(!test.equals("boob") && !characteristic.equals(characteristics.get(2)))
             {
                 SQL_Class sqlClass = new SQL_Class();
                 if(sqlClass.SQL_connect()) {
                    int a = sqlClass.sql_device(device.getAddress());
-                   Intent intent = new Intent(BluetoothConnectActivity.this, GetActivity.class);
+
                    intent.putExtra("ip", test);
                    intent.putExtra("id_device", a);
-                   startActivity(intent);
+                    startActivity(intent);
+
                 }
             }
             else if(characteristic.equals(characteristics.get(2)))
@@ -122,6 +125,9 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
                 String [] mass = test.split(",");
                 txt.setText(MessageFormat.format("SN:{0}\tЦех:{1}\tЗавод:{2}", mass[0], mass[1], mass[2]));
 
+            }
+            else {
+                Toast.makeText(BluetoothConnectActivity.this,"Устройство не подключено к WiFi",Toast.LENGTH_SHORT).show();
             }
         }
         @Override
@@ -145,6 +151,7 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
         EditText login,password;
         login = findViewById(R.id.Login);
         password = findViewById(R.id.Password);
+
         if(!login.getText().equals("") && !password.getText().equals("") ) {
             String wifi = login.getText() + "," + password.getText();
 
@@ -154,6 +161,8 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
                 bluetoothGatt.writeCharacteristic(characteristic);
                 LinearLayout wifi_conn = findViewById(R.id.wifi_conn);
                 wifi_conn.setVisibility(View.GONE);
+                btn_graphics.setVisibility(View.VISIBLE);
+                btn_settings.setVisibility(View.VISIBLE);
             } catch (Exception e) {
             }
         }
@@ -162,15 +171,9 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
         }
 
     }
-    @SuppressLint("MissingPermission")
-    public void Get_Ip(View view) {
-        BluetoothGattCharacteristic characteristic = characteristics.get(1);
-        bluetoothGatt.readCharacteristic(characteristic);
-    }
-
     public void show(View view) {
-        LinearLayout wifi_conn = findViewById(R.id.wifi_conn);
         wifi_conn.setVisibility(View.VISIBLE);
+        btn_wifi.setVisibility(View.GONE);
     }
 
     @SuppressLint("MissingPermission")
@@ -180,27 +183,66 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
 
     @SuppressLint("MissingPermission")
     public void send_info(View view) {
+        EditText sn, ceh, zavod;
+        sn = findViewById(R.id.SN);
+        ceh = findViewById(R.id.Ceh);
+        zavod = findViewById(R.id.Zavod);
+        if (!sn.getText().equals("") || !ceh.getText().equals("") || !zavod.getText().equals("")) {
+            String info = MessageFormat.format("{0},{1},{2}", sn.getText(), ceh.getText(), zavod.getText());
+            BluetoothGattCharacteristic characteristic = characteristics.get(2);
+            characteristic.setValue(info);
+            bluetoothGatt.writeCharacteristic(characteristic);
+            set_base_info.setVisibility(View.GONE);
+            btn_graphics.setVisibility(View.VISIBLE);
+            btn_settings.setVisibility(View.VISIBLE);
+            base_info.setVisibility(View.VISIBLE);
+        }
+        else {
+        Toast.makeText(this, "Введите что то одно", Toast.LENGTH_SHORT).show();
+        }
 
-        BluetoothGattCharacteristic characteristic = characteristics.get(2);
-        characteristic.setValue("Значение1,Значение2,Значение3");
-        bluetoothGatt.writeCharacteristic(characteristic);
     }
-
     @Override
     public void onDataChanged(int setting) {
 
         btn_settings.setVisibility(View.GONE);
-        btn_graphics.setVisibility(View.VISIBLE);
+        btn_graphics.setVisibility(View.GONE);
+        base_info.setVisibility(View.GONE);
+        btn_back.setVisibility(View.VISIBLE);
         switch (setting){
 
             case 0:
                 btn_wifi.setVisibility(View.VISIBLE);
-
                 break;
             case 1:
 
+                set_base_info.setVisibility(View.VISIBLE);
                 break;
 
         }
+    }
+
+    public void settings(View view) {
+        DialogSettingsFragment dialogSettingsFragment = new DialogSettingsFragment();
+        dialogSettingsFragment.show(getSupportFragmentManager(),"852");
+    }
+
+    @SuppressLint("MissingPermission")
+    public void Graphics(View view) {
+        BluetoothGattCharacteristic characteristic1 = characteristics.get(1);
+        bluetoothGatt.readCharacteristic(characteristic1);
+    }
+
+    public void back(View view) {
+
+        btn_wifi.setVisibility(View.GONE);
+        btn_back.setVisibility(View.GONE);
+        set_base_info.setVisibility(View.GONE);
+        wifi_conn.setVisibility(View.GONE);
+        btn_graphics.setVisibility(View.VISIBLE);
+        btn_settings.setVisibility(View.VISIBLE);
+        base_info.setVisibility(View.VISIBLE);
+
+
     }
 }

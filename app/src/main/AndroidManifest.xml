@@ -29,8 +29,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".BluetoothConnectActivity"/>
-        <activity android:name=".GetActivity"/>
+        <activity android:name=".BluetoothConnectActivity"
+            android:screenOrientation="landscape"
+            tools:ignore="DiscouragedApi"/>
+        <activity android:name=".GetActivity"
+            android:screenOrientation="landscape"
+            tools:ignore="DiscouragedApi" />
     </application>
 
 </manifest>

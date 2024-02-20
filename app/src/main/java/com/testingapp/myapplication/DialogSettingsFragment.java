@@ -8,8 +8,9 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 
-public class DialogSettingsFragment extends DialogFragment{
+public class DialogSettingsFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -21,15 +22,16 @@ public class DialogSettingsFragment extends DialogFragment{
         btn_WiFi.setOnClickListener(v -> {
             if (getActivity() instanceof OnDataChangeListener) {
                 ((OnDataChangeListener) getActivity()).onDataChanged(0);
+                dismiss();
             }
 
         });
         btn_info.setOnClickListener(v -> {
             if (getActivity() instanceof OnDataChangeListener) {
                 ((OnDataChangeListener) getActivity()).onDataChanged(1);
+                dismiss();
             }
         });
-
         return view;
 
     }
