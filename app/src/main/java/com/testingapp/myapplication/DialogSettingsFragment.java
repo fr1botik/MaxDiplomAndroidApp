@@ -18,6 +18,7 @@ public class DialogSettingsFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.settings_activity,container,false);
         Button btn_WiFi = view.findViewById(R.id.WiFi);
         Button btn_info = view.findViewById(R.id.Base_Info);
+        Button btn_sql = view.findViewById(R.id.btn_sql);
 
         btn_WiFi.setOnClickListener(v -> {
             if (getActivity() instanceof OnDataChangeListener) {
@@ -29,6 +30,12 @@ public class DialogSettingsFragment extends DialogFragment {
         btn_info.setOnClickListener(v -> {
             if (getActivity() instanceof OnDataChangeListener) {
                 ((OnDataChangeListener) getActivity()).onDataChanged(1);
+                dismiss();
+            }
+        });
+        btn_sql.setOnClickListener(v -> {
+            if (getActivity() instanceof OnDataChangeListener) {
+                ((OnDataChangeListener) getActivity()).onDataChanged(2);
                 dismiss();
             }
         });

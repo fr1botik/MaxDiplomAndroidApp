@@ -1,31 +1,35 @@
 package com.testingapp.myapplication;
 
-import android.os.Bundle;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.StrictMode;
 import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
 
 public class SQL_Class {
 
-    private static String ip = "192.168.5.67";
+    private  String ip ;
+    private static String IP_KEY = "ip_key";
     private static String  port= "61344";
     private static String Clases = "net.sourceforge.jtds.jdbc.Driver";
     private static String database = "IoT_device";
     private static String user = "connect";
     private static  String password = "123456";
-    private static  String url = "jdbc:jtds:sqlserver://"+ip+":"+port+":"+database;
+    private static  String url ;
     private Connection connection = null;
+    private Context context;
+
+    public SQL_Class(Context context) {
+        this.context = context;
+        SharedPreferences sharedPreferences = context.getSharedPreferences("SQL_Preferences", Context.MODE_PRIVATE);
+        ip = sharedPreferences.getString(IP_KEY, "192.168.5.67");
+        url = "jdbc:jtds:sqlserver://" + ip + ":" + port + ":" + database;
+    }
 
     public boolean SQL_connect(){
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -146,5 +150,14 @@ public class SQL_Class {
         }
 
 
+    }
+    public void setIpAddress(String newIp) {
+        ip = newIp;
+        url = "jdbc:jtds:sqlserver://" + ip + ":" + port + ":" + database;
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences("SQL_Preferences", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(IP_KEY, ip);
+        editor.apply();
     }
 }

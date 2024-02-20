@@ -100,4 +100,6 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this,"Включите блюзут!",Toast.LENGTH_SHORT).show();
         }
     }
+
+
 }

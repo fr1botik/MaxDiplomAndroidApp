@@ -26,4 +26,11 @@
         android:text="Базовая информация"
         android:textSize="20sp" />
 
+    <Button
+        android:id="@+id/btn_sql"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="IP для БД"
+        android:textSize="20sp" />
+
 </LinearLayout>

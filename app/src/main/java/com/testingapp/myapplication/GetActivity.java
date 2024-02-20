@@ -8,23 +8,19 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.io.IOException;
-import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -100,7 +96,7 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
                     }
                     temp = responseBody.string();
                     String[]mass = temp.split("\\r\\n");
-                    SQL_Class sqlClass = new SQL_Class();
+                    SQL_Class sqlClass = new SQL_Class(getApplicationContext());
                     for(int i = 0;i< mass.length;i++){
                         String[]mass1 = mass[i].split(",");
                         datas datas = new datas();
@@ -148,7 +144,7 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
                     }
                     magnet = responseBody.string();
                     String[]mass = magnet.split("\\n");
-                    SQL_Class sqlClass = new SQL_Class();
+                    SQL_Class sqlClass = new SQL_Class(getApplicationContext());
                     for(int i = 0;i< mass.length;i++){
                         String[]mass1 = mass[i].split(",");
                         datas datas = new datas();
@@ -197,7 +193,7 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
                     }
                     vibro = responseBody.string();
                     String[]mass = vibro.split("\\n");
-                    SQL_Class sqlClass = new SQL_Class();
+                    SQL_Class sqlClass = new SQL_Class(getApplicationContext());
                     for(int i = 1;i< mass.length-1;i++){
                         String[]mass1 = mass[i].split(",");
                         datas datas = new datas();
@@ -382,6 +378,11 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
                 break;
         }
     }
+    public void diapozon(View view) {
+        DialogGetGraphics dialogGetGraphics = new DialogGetGraphics();
+        dialogGetGraphics.show(getSupportFragmentManager(),"dialog");
+
+    }
 
     @Override
     public void getData(String date) {
@@ -389,7 +390,7 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
     }
 
     @Override
-    public void getTime(String date) {
+    public void getTime(String date_start,String date_end) {
 
     }
 }

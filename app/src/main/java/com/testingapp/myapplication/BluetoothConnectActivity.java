@@ -10,7 +10,7 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,7 +33,7 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
     BluetoothGattService services;
     List<BluetoothGattCharacteristic> characteristics;
     Button btn_wifi,btn_settings,btn_graphics,btn_back;
-    LinearLayout base_info,set_base_info,wifi_conn;
+    LinearLayout base_info,set_base_info,wifi_conn,ip_sql;
     Intent intent;
 
     @SuppressLint("MissingPermission")
@@ -60,6 +60,7 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
         base_info = findViewById(R.id.layout_base);
         wifi_conn = findViewById(R.id.wifi_conn);
         btn_back = findViewById(R.id.back_btn);
+        ip_sql = findViewById(R.id.ip_layout);
         set_base_info = findViewById(R.id.layout_base_info);
         intent = new Intent(BluetoothConnectActivity.this, GetActivity.class);
 
@@ -106,17 +107,20 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
             super.onCharacteristicRead(gatt, characteristic, status);
 
             byte[] value1 = characteristic.getValue();
-             test = new String(value1, StandardCharsets.UTF_8);
+            test = new String(value1, StandardCharsets.UTF_8);
 
             if(!test.equals("boob") && !characteristic.equals(characteristics.get(2)))
             {
-                SQL_Class sqlClass = new SQL_Class();
+                SQL_Class sqlClass = new SQL_Class(getApplicationContext());
                 if(sqlClass.SQL_connect()) {
                    int a = sqlClass.sql_device(device.getAddress());
 
                    intent.putExtra("ip", test);
                    intent.putExtra("id_device", a);
-                    startActivity(intent);
+                   startActivity(intent);
+                }
+                else{
+                    runOnUiThread(()-> Toast.makeText(BluetoothConnectActivity.this,"Устройство не подключается к SQL",Toast.LENGTH_SHORT).show());
 
                 }
             }
@@ -127,7 +131,8 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
 
             }
             else {
-                Toast.makeText(BluetoothConnectActivity.this,"Устройство не подключено к WiFi",Toast.LENGTH_SHORT).show();
+                runOnUiThread(() -> Toast.makeText(BluetoothConnectActivity.this,"Устройство не подключено к WiFi",Toast.LENGTH_SHORT).show());
+
             }
         }
         @Override
@@ -215,8 +220,10 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
                 btn_wifi.setVisibility(View.VISIBLE);
                 break;
             case 1:
-
                 set_base_info.setVisibility(View.VISIBLE);
+                break;
+            case 2:
+                ip_sql.setVisibility(View.VISIBLE);
                 break;
 
         }
@@ -238,11 +245,24 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
         btn_wifi.setVisibility(View.GONE);
         btn_back.setVisibility(View.GONE);
         set_base_info.setVisibility(View.GONE);
+        ip_sql.setVisibility(View.GONE);
         wifi_conn.setVisibility(View.GONE);
         btn_graphics.setVisibility(View.VISIBLE);
         btn_settings.setVisibility(View.VISIBLE);
         base_info.setVisibility(View.VISIBLE);
 
+    }
 
+    public void set_ip(View view) {
+        EditText sql_ip = findViewById(R.id.ip_text);
+        if(!sql_ip.getText().equals("")) {
+            btn_graphics.setVisibility(View.VISIBLE);
+            btn_settings.setVisibility(View.VISIBLE);
+            base_info.setVisibility(View.VISIBLE);
+            ip_sql.setVisibility(View.GONE);
+
+            SQL_Class sqlClass = new SQL_Class(getApplicationContext());
+            sqlClass.setIpAddress(sql_ip.getText().toString());
+        }
     }
 }
