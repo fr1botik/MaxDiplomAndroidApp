@@ -168,6 +168,10 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
                 wifi_conn.setVisibility(View.GONE);
                 btn_graphics.setVisibility(View.VISIBLE);
                 btn_settings.setVisibility(View.VISIBLE);
+                base_info.setVisibility(View.VISIBLE);
+                btn_back.setVisibility(View.GONE);
+                BluetoothGattCharacteristic characteristic1 = characteristics.get(2);
+                bluetoothGatt.readCharacteristic(characteristic1);
             } catch (Exception e) {
             }
         }
@@ -253,12 +257,14 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
 
     }
 
+    @SuppressLint("MissingPermission")
     public void set_ip(View view) {
         EditText sql_ip = findViewById(R.id.ip_text);
         if(!sql_ip.getText().equals("")) {
             btn_graphics.setVisibility(View.VISIBLE);
             btn_settings.setVisibility(View.VISIBLE);
             base_info.setVisibility(View.VISIBLE);
+            btn_back.setVisibility(View.GONE);
             ip_sql.setVisibility(View.GONE);
 
             SQL_Class sqlClass = new SQL_Class(getApplicationContext());
