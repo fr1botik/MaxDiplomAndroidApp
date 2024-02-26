@@ -121,13 +121,18 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
                 }
                 else{
                     runOnUiThread(()-> Toast.makeText(BluetoothConnectActivity.this,"Устройство не подключается к SQL",Toast.LENGTH_SHORT).show());
-
                 }
             }
             else if(characteristic.equals(characteristics.get(2)))
             {
-                String [] mass = test.split(",");
-                txt.setText(MessageFormat.format("SN:{0}\tЦех:{1}\tЗавод:{2}", mass[0], mass[1], mass[2]));
+
+                runOnUiThread(() -> {
+                    try {
+                        String[] mass = test.split(",");
+                        txt.setText(MessageFormat.format("SN:{0}\tЦех:{1}\tЗавод:{2}", mass[0], mass[1], mass[2]));
+                    }
+                    catch (Exception e){}
+                    });
 
             }
             else {
@@ -170,9 +175,15 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
                 btn_settings.setVisibility(View.VISIBLE);
                 base_info.setVisibility(View.VISIBLE);
                 btn_back.setVisibility(View.GONE);
+
+            } catch (Exception e) {
+            }
+            try {
+                Thread.sleep(1000);
                 BluetoothGattCharacteristic characteristic1 = characteristics.get(2);
                 bluetoothGatt.readCharacteristic(characteristic1);
-            } catch (Exception e) {
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
         else {
@@ -205,6 +216,15 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
             btn_graphics.setVisibility(View.VISIBLE);
             btn_settings.setVisibility(View.VISIBLE);
             base_info.setVisibility(View.VISIBLE);
+            try {
+                Thread.sleep(1000);
+                BluetoothGattCharacteristic characteristic1 = characteristics.get(2);
+                bluetoothGatt.readCharacteristic(characteristic1);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            BluetoothGattCharacteristic characteristic1 = characteristics.get(2);
+            bluetoothGatt.readCharacteristic(characteristic1);
         }
         else {
         Toast.makeText(this, "Введите что то одно", Toast.LENGTH_SHORT).show();
@@ -266,6 +286,8 @@ public class BluetoothConnectActivity extends AppCompatActivity implements Dialo
             base_info.setVisibility(View.VISIBLE);
             btn_back.setVisibility(View.GONE);
             ip_sql.setVisibility(View.GONE);
+            BluetoothGattCharacteristic characteristic = characteristics.get(2);
+            bluetoothGatt.readCharacteristic(characteristic);
 
             SQL_Class sqlClass = new SQL_Class(getApplicationContext());
             sqlClass.setIpAddress(sql_ip.getText().toString());

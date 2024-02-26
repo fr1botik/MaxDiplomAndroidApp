@@ -2,6 +2,7 @@ package com.testingapp.myapplication;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +29,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Callback;
@@ -56,6 +59,7 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sqlClass =  new SQL_Class(getApplicationContext());
+        sqlClass.SQL_connect();
         setContentView(R.layout.get_activity);
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
@@ -107,7 +111,7 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
     //GET-запрос на получение данных температуры
     private void Get_temp(){
 
-        list_temp = new ArrayList<>();
+        list_temp = new ArrayList<>(10000000);
 
         Request request = new Request.Builder()
                 .url(addres+"temp")
@@ -132,17 +136,8 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
                         list_temp.add(datas);
 
                     }
-                    for(int i = 0;i< list_temp.size();i++){
-                        try {
-                            if(sqlClass.SQL_connect()) {
-                                sqlClass.sql_temp(id_device, list_temp.get(i).getDate(), list_temp.get(i).getData(),list_temp.get(i).getTime());
-                            }
-                        }catch (Exception e){
+                    sqlClass.sql_temp(list_temp,id_device);
 
-                            break;
-                        }
-
-                    }
                 }
             }
             @Override
@@ -155,7 +150,7 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
     //GET-запрос на получение данных магнитного поля
     private void Get_magnet(){
 
-        list_magnet = new ArrayList<>();
+        list_magnet = new ArrayList<>(100000);
 
         Request request = new Request.Builder()
                 .url(addres+ "magnet")
@@ -179,18 +174,7 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
                         list_magnet.add(datas);
 
                     }
-                    for(int i = 0;i<list_magnet.size();i++){
-                       try {
-                           if(sqlClass.SQL_connect()) {
-                               sqlClass.sql_magnetic(id_device, list_magnet.get(i).getDate(), list_magnet.get(i).getData(),list_magnet.get(i).getTime());
-                           }
-                       }
-                       catch (Exception e){
-
-                           break;
-                       }
-
-                    }
+                    sqlClass.sql_magnetic(list_magnet,id_device);
                 }
             }
             @Override
@@ -202,7 +186,7 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
     }
     private void Get_vibro(){
 
-        list_vibro = new ArrayList<>();
+        list_vibro = new ArrayList<>(10000000);
 
         Request request = new Request.Builder()
                 .url(addres+ "vibro")
@@ -223,18 +207,10 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
                         datas datas = new datas();
                         datas.setDate(mass1[0]);
                         datas.setTime(mass1[1]);
-                        datas.setData(mass1[2]);
+                        datas.setData(mass1[3]);
                         list_vibro.add(datas);
                     }
-                    for(int i = 0;i<list_vibro.size();i++) {
-                        try {
-                            if (sqlClass.SQL_connect()) {
-                                sqlClass.sql_vibro(id_device, list_vibro.get(i).getDate(), list_vibro.get(i).getData(),list_vibro.get(i).getTime());
-                            }
-                        } catch (Exception e) {
-                            break;
-                        }
-                    }
+                    sqlClass.sql_vibro(list_vibro,id_device);
                 }
             }
             @Override
@@ -373,13 +349,29 @@ public class GetActivity extends AppCompatActivity  implements DataPickerFragmen
     }
     //OnClick кнопки для получения данных
     public void Get_data(View view) {
-        try {
-            Get_FFT();
-            Get_temp();
-            Get_magnet();
-            Get_vibro();
-        }
-        catch (Exception e){}
+        ExecutorService service = Executors.newFixedThreadPool(3);
+
+        service.submit(new Runnable() {
+            @Override
+            public void run() {
+                Get_temp();
+            }
+        });
+        service.submit(new Runnable() {
+            @Override
+            public void run() {
+                Get_vibro();
+            }
+        });
+        service.submit(new Runnable() {
+            @Override
+            public void run() {
+                Get_magnet();
+            }
+        });
+        service.shutdown();
+        Get_FFT();
+
 
     }
     //OnClick кнопки для вывода данных на график

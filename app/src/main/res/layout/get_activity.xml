@@ -59,7 +59,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="36dp"
         android:onClick="diapozon"
-        android:text="Диапозон"
+        android:text="Диапазон"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.897"
         app:layout_constraintStart_toStartOf="parent"

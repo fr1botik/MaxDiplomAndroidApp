@@ -44,8 +44,10 @@ public class SQL_Class {
             connect = true;
         } catch (ClassNotFoundException e) {
             Log.e("Class not FOund",e.getMessage());
+            connect = false;
         } catch (SQLException e) {
             Log.e("CXZCXCX",e.getMessage());
+            connect = false;
         }
         return connect;
     }
@@ -81,74 +83,97 @@ public class SQL_Class {
         }
         return a;
     }
-    public void sql_temp(int id_device,String Data,String temperature,String time){
+    public void sql_temp(List<datas> datas,int id_device){
 
-        if(connection!=null){
+        for(datas datas1 : datas){
+        if(connection!=null) {
             try {
-                String checkQuery = "use "+ database+" \n SELECT * FROM Temperature WHERE Time = ?";
+                String checkQuery = "use " + database + " \n SELECT * FROM Temperature WHERE Time = ? AND Date = ?";
                 PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
-                checkStatement.setString(1, time);
+                checkStatement.setString(1, datas1.getTime());
+                checkStatement.setString(2, datas1.getDate());
                 ResultSet resultSet = checkStatement.executeQuery();
 
                 if (!resultSet.next()) {
-                    String insertQuery ="use "+ database+" \n INSERT INTO Temperature (Date,Time,Temperature,ID_device) VALUES (?,?,?,?)";
+                    String insertQuery = "use " + database + " \n INSERT INTO Temperature (Date,Time,Temperature,ID_device) VALUES (?,?,?,?)";
                     PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
-                    insertStatement.setString(1, Data);
-                    insertStatement.setString(2, time);
-                    insertStatement.setString(3,temperature);
-                    insertStatement.setInt(4,id_device);
+                    insertStatement.setString(1, datas1.getDate());
+                    insertStatement.setString(2, datas1.getTime());
+                    insertStatement.setString(3, datas1.getData());
+                    insertStatement.setInt(4, id_device);
                     insertStatement.executeUpdate();
+                    Log.d("SQL_data","WRITING TEMP");
+                }
+                else{
+
+                    Log.d("SQL_data","NOT WRITING TEMP");
                 }
             } catch (SQLException e) {
-                Log.e("852",e.getMessage());
+                Log.e("852", e.getMessage());
+            }
+        }
+        }
+    }
+    public void sql_vibro(List<datas> datas,int id_device) {
+        if(connection!=null){
+            for(datas datas1 : datas) {
+                try {
+                    String checkQuery = "use " + database + " \n SELECT * FROM Vibration WHERE Time = ? AND Date = ?";
+                    PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
+                    checkStatement.setString(1, datas1.getTime());
+                    checkStatement.setString(2, datas1.getDate());
+                    ResultSet resultSet = checkStatement.executeQuery();
+
+                    if (!resultSet.next()) {
+                        String insertQuery = "use " + database + " \n INSERT INTO Vibration (Date,Time,Vibration,ID_device) VALUES (?,?,?,?)";
+                        PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
+                        insertStatement.setString(1, datas1.getDate());
+                        insertStatement.setString(2, datas1.getTime());
+                        insertStatement.setString(3, datas1.getData());
+                        insertStatement.setInt(4, id_device);
+                        insertStatement.executeUpdate();
+                        Log.d("SQL_data","WRITING VIBRO");
+                    }
+                    else{
+
+                        Log.d("SQL_data","NOT WRITING VIBRO");
+                    }
+                } catch (SQLException e) {
+                    Log.e("852", e.getMessage());
+                }
             }
         }
     }
-    public void sql_vibro(int id_device,String Data,String vibro,String time) {
-        if(connection!=null){
-            try {
-                String checkQuery = "use "+ database+" \n SELECT * FROM Vibration WHERE Time = ?";
-                PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
-                checkStatement.setString(1, time);
-                ResultSet resultSet = checkStatement.executeQuery();
+    public void sql_magnetic(List<datas> datas,int id_device){
+        if(connection!=null) {
+            for (datas datas1 : datas) {
+                try {
+                    String checkQuery = "use " + database + " \n SELECT * FROM Magnetic WHERE Time = ? AND Date = ?";
+                    PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
+                    checkStatement.setString(1, datas1.getTime());
+                    checkStatement.setString(2, datas1.getDate());
+                    ResultSet resultSet = checkStatement.executeQuery();
 
-                if (!resultSet.next()) {
-                    String insertQuery ="use "+ database+" \n INSERT INTO Vibration (Date,Time,Vibration,ID_device) VALUES (?,?,?,?)";
-                    PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
-                    insertStatement.setString(1, Data);
-                    insertStatement.setString(2, time);
-                    insertStatement.setString(3,vibro);
-                    insertStatement.setInt(4,id_device);
-                    insertStatement.executeUpdate();
+
+                    if (!resultSet.next()) {
+                        String insertQuery = "use " + database + " \n INSERT INTO Magnetic (Date,Time,Magnetic,ID_device) VALUES (?,?,?,?)";
+                        PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
+                        insertStatement.setString(1, datas1.getDate());
+                        insertStatement.setString(2, datas1.getTime());
+                        insertStatement.setString(3, datas1.getData());
+                        insertStatement.setInt(4, id_device);
+                        insertStatement.executeUpdate();
+                        Log.d("SQL_data","WRITING MAGNETIC");
+                    }
+                    else{
+
+                        Log.d("SQL_data","NOT WRITING MAGNETIC");
+                    }
+                } catch (SQLException e) {
+                    Log.e("852", e.getMessage());
                 }
-            } catch (SQLException e) {
-                Log.e("852",e.getMessage());
             }
         }
-    }
-    public void sql_magnetic(int id_device,String Data,String magnetic,String time){
-        if(connection!=null){
-            try {
-                String checkQuery = "use "+ database+" \n SELECT * FROM Magnetic WHERE Time = ?";
-                PreparedStatement checkStatement = connection.prepareStatement(checkQuery);
-                checkStatement.setString(1, time);
-                ResultSet resultSet = checkStatement.executeQuery();
-
-                if (!resultSet.next()) {
-                    String insertQuery ="use "+ database+" \n INSERT INTO Magnetic (Date,Time,Magnetic,ID_device) VALUES (?,?,?,?)";
-                    PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
-                    insertStatement.setString(1, Data);
-                    insertStatement.setString(2, time);
-                    insertStatement.setString(3,magnetic);
-                    insertStatement.setInt(4,id_device);
-                    insertStatement.executeUpdate();
-                }
-            } catch (SQLException e) {
-                Log.e("852",e.getMessage());
-            }
-        }
-
-
     }
     public List<SQL_data> sql_get_data(int table, String Data, String time_start, String time_end) {
         List<SQL_data> dataList = new ArrayList<>();
